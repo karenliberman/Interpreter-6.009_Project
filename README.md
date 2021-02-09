@@ -18,8 +18,25 @@ Takes a nonnegative integer n as input and returns n!.
 
     (if (=? n 0) 1 (* n (factorial (- n 1))))
     )
-    
-    
+
+### Polynomial Evaluation
+We'll represent polynomials in xx as lists of coefficients, starting with the zeroth-order coefficient. For example, we would represent x^2 as (list 0 0 1), and 4x^3 + 7x - 8 as (list -8 7 0 4).
+Your function should take two arguments: a list containing coefficients in this form and a value to plug in for xx; and it should return a single number representing the value of the polynomial at that value of xx. 
+
+    (define (poly-val coeffs x)
+
+    (if (=? coeffs nil) 0 
+    (+ (car coeffs) (* x (poly-val(cdr coeffs) x))))
+
+    )
+
+### Range
+It is a function that replicates the behavior of range in Python. It has the format (range start stop step) and outputs a list containing the same numbers that would exist in Python's range(start, stop, step).
+Unlike Python's range, it handles the cases of positive step arguments, and all three arguments must be provided.
+
+    (define (range start stop step)
+    (if (< start stop) (concat (list start) (range (+ start step) stop step) ) nil)
+    )
 
 # Coding in the Interpreter (with examples)
  
@@ -132,3 +149,57 @@ OPERATING ON LISTS (METHODS)
 
   -  (reduce FUNCTION LIST INITVAL) takes a function, a list, and an initial value as inputs. It produces its output by successively applying the given function to the elements in the list, maintaining an intermediate result along the way. This is perhaps the most difficult of the three functions to understand, but it may be easiest to see by example.
      Consider (reduce * (list 9 8 7) 1). The function in question is *. Our initial value is 1. We take this value and combine it with the first element in the list using the given function, giving us (* 1 9) or 9. Then we take this result and combine it with the next element in the list using the given function, giving us (* 9 8) or 72. Then we take this result and combine it with the next element in the list using the given function, giving us (* 72 7) or 504. Since we have reached the end of the list, this is our final return value (if there were more elements in the list, we would keep combining our "result so far" with the next element in the list, using the given function).
+     
+     
+ ### Let
+let is used for creating local variable definitions. It takes the form: (let ((VAR1 VAL1) (VAR2 VAL2) (VAR3 VAL3) ...) BODY), where VAR1, VAR2, etc., are variable names, and VAL1, VAL2, etc., are expressions denoting the values to which those names should be bound. It works by:
+  - Evaluating all the given values in the current environment.
+  - Creating a new environment whose parent is the current environment, binding each name to its associated value in this new environment.
+  - Evaluating the BODY expression in this new environment (this value is the result of evaluating the let special form).
+Note that the given bindings are only available in the body of the let expression. For example:
+
+    in> (define z 5)
+        out> 5
+
+    in> (let ((x 5) (y 3)) (+ x y z))
+        out> 13
+
+    in> x
+        EXCEPTION!
+
+    in> y
+        EXCEPTION!
+
+    in> z
+        out> 5
+         
+
+### Set
+set! (often pronounced "set-bang") is used for changing the value of an existing variable. It takes the form: (set! VAR EXPR), where VAR is a variable name, and EXPR is an expression.
+It should work by:
+  - Evaluating the given expression in the current environment
+  - Finding the nearest enclosing environment in which VAR is defined (starting from the current environment and working upward until it finds a binding), and updating its binding in that environment to be the result of evaluating EXPR
+It should also evaluate to that same value.
+
+If VAR is not defined in any environments in the chain, set! should raise a SnekNameError.
+
+    in> (define x 7)
+        out> 7
+
+    in> (define (foo z) (set! x (+ z 2)))
+        out> function object
+
+    in> (foo 3)
+        out> 5
+
+    in> x
+        out> 5
+
+    in> (define (bar z) (define x (+ z 2)))
+        out> function object
+
+    in> (bar 7)
+        out> 9
+
+    in> x
+        out> 5
